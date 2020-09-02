@@ -8,11 +8,12 @@ import { Header } from './Header';
 import { HomePage } from './HomePage';
 //import { NotFoundPage } from './NotFoundPage';
 import { gray2, fontSize, fontFamily } from './Styles';
+import { QuestionPage } from './QuestionPage';
 
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
 import { NotFoundPage } from './NotFoundPage';
-//  196
+//  218
 /*function App() {
   debugger;
   return (
@@ -38,6 +39,7 @@ const App: React.FC = () => {
           <Route path="/search" component={SearchPage} />
           <Route path="/ask" component={AskPage} />
           <Route path="/signin" component={SignInPage} />
+          <Route path="/questions/:questionId" component={QuestionPage} />
           <Route component={NotFoundPage} />
         </switch>
       </div>
