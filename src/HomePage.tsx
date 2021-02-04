@@ -25,8 +25,9 @@ export const HomePage = () => {
     doGetUnansweredQuestions();
   });
   const handleAskQuestionClick = () => {
-    setCount(count + 1);
-    console.log('TODO - move to the AskPage');
+    // setCount(count + 1);
+    // console.log('TODO - move to the AskPage');
+    window.location.assign('http://localhost:3000/ask');
   };
 
   return (
