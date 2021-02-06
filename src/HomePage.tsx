@@ -1,29 +1,50 @@
-import React from 'react';
+import React, {FC} from 'react';
 import { PrimaryButton } from './Styles';
 /** @jsx jsx */
 import { css, jsx } from '@emotion/core';
 import { QuestionList } from './QuestionList';
-import { getUnansweredQuestions, QuestionData } from './QuestionData';
+import { QuestionData } from './QuestionData';
 import { useEffect, useState } from 'react';
 import { Page } from './Page';
 import { PageTitle } from './PageTitle';
 import { async } from 'q';
+import {connect} from 'react-redux';
+import {ThunkDispatch} from 'redux-thunk';
+import {AnyAction} from 'redux';
+import {getUnansweredQuestionsActionCreator,
+  AppState} from './Store';
+import { RouteComponentProps } from 'react-router-dom';
 
 const renderQuestion = (question: QuestionData) => <div>{question.title}</div>;
 
-export const HomePage = () => {
-  const [questions, setQuestions] = useState<QuestionData[] | null>(null);
-  const [questionsLoading, setQuestionsLoading] = useState(true);
+interface Props extends RouteComponentProps {
+  getUnansweredQuestions: () => Promise<void>;
+  questions: QuestionData[] | null;
+  questionsLoading: boolean;
+}
+
+const HomePage: FC<Props> = ({
+  history,
+  questions,
+  questionsLoading,
+  getUnansweredQuestions
+})=>{
+ // const [questions, setQuestions] = useState<QuestionData[] | null>(null);
+ // const [questionsLoading, setQuestionsLoading] = useState(true);
   const [count, setCount] = useState(0);
   useEffect(() => {
     //  console.log('first rendered');
-    const doGetUnansweredQuestions = async () => {
-      const unansweredQuestions = await getUnansweredQuestions();
-      setQuestions(unansweredQuestions);
-      setQuestionsLoading(false);
-    };
-    doGetUnansweredQuestions();
-  });
+  //  const doGetUnansweredQuestions = async () => {
+  //    const unansweredQuestions = await getUnansweredQuestions();
+  //    setQuestions(unansweredQuestions);
+  //    setQuestionsLoading(false);
+  //  };
+  //  doGetUnansweredQuestions();
+  if (questions === null) {
+    getUnansweredQuestions();
+  }
+  }, [questions, getUnansweredQuestions]
+  );
   const handleAskQuestionClick = () => {
     // setCount(count + 1);
     // console.log('TODO - move to the AskPage');
@@ -68,3 +89,24 @@ export const HomePage = () => {
     </Page>
   );
 };
+
+const mapStateToProps = (store: AppState) => {
+  return {
+    questions: store.questions.unanswered,
+    questionsLoading: store.questions.loading
+  };
+};
+
+const mapDispatchToTrops =(
+  dispatch: ThunkDispatch<any, any, AnyAction>,
+) => {
+  return {
+    getUnansweredQuestions: () => 
+      dispatch(getUnansweredQuestionsActionCreator()),
+  };
+;}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToTrops
+)(HomePage);

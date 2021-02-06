@@ -15,7 +15,7 @@ export const Header: FC<RouteComponentProps> = ({ history, location }) => {
     setSearch(e.currentTarget.value);
   };
 
-  const handleSearchSubmit = (e: FormEvent<HTMLFontElement>) => {
+  const handleSearchSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     history.push(`/search?criteria=${search}`);
   };

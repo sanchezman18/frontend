@@ -33,7 +33,8 @@ export interface SubmitResult {
 interface Props {
   submitCaption?: string;
   validationRules?: ValidationProp;
-  onSubmit: (values: Values) => Promise<SubmitResult>;
+  onSubmit: (values: Values) => Promise<SubmitResult> | void;
+  submitResult?: SubmitResult;
   succesMessage?: string;
   failureMessage?: string;
 }
@@ -70,6 +71,7 @@ export const Form: FC<Props> = ({
   children,
   validationRules,
   onSubmit,
+  submitResult,
   succesMessage = 'Succes!',
   failureMessage = 'Something went wrong',
 }) => {
@@ -116,6 +118,19 @@ export const Form: FC<Props> = ({
     setErrors(newErrors);
     return !haveError;
   };
+
+  const disabled = submitResult
+    ? submitResult.succes
+    : submitting || (submitted && !submitError);
+
+  const showError = submitResult
+  ? !submitResult.succes
+  : submitted && submitError;
+
+  const showSucces = submitResult 
+  ? submitResult.succes
+  : submitted && !submitError;
+
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (validateForm()) {
@@ -123,6 +138,9 @@ export const Form: FC<Props> = ({
       setSubmitError(false);
       // TODO - call the consumer submit function
       const result = await onSubmit(values);
+      if (result === undefined) {
+        return;
+      }
       setErrors(result.errors || {});
       setSubmitError(!result.succes);
       setSubmitting(false);
@@ -147,7 +165,7 @@ export const Form: FC<Props> = ({
     >
       <form noValidate={true} onSubmit={handleSubmit}>
         <fieldset
-          disabled={submitting || (submitted && !submitError)}
+          disabled={disabled}
           css={css`
             margin: 10px auto 0 auto;
             padding: 30px;
@@ -168,16 +186,14 @@ export const Form: FC<Props> = ({
           >
             <PrimaryButton type="submit">{submitCaption}</PrimaryButton>
           </div>
-          {submitted && submitError && (
-            <p
+            { showError && <p
               css={css`
                 color: red;
               `}
             >
               {failureMessage}
-            </p>
-          )}
-          {submitted && !submitError && (
+            </p>}
+          {showSucces &&
             <p
               css={css`
                 color: green;
@@ -185,7 +201,7 @@ export const Form: FC<Props> = ({
             >
               {succesMessage}
             </p>
-          )}
+          }
         </fieldset>
       </form>
     </FormContext.Provider>
